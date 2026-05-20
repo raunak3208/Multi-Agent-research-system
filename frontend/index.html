@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ARIA — Multi-Agent Research Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    /* CSS VARIABLES & RESET */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:       #F6F1D8;
+      --yellow-soft: #F3E79A;
+      --sky:         #D8E8F7;
+      --gray-white:  #F4F4F2;
+      --black:       #111111;
+      --accent:      #E9C84A;
+      --accent-dim:  #C9A830;
+      --text-1:      #1A1A1A;
+      --text-2:      #4A4A4A;
+      --text-3:      #8A8A8A;
+      --border:      rgba(17,17,17,0.08);
+      --glass-bg:    rgba(246,241,216,0.72);
+      --glass-dark:  rgba(17,17,17,0.04);
+      --shadow-sm:   0 2px 8px rgba(17,17,17,0.06);
+      --shadow-md:   0 8px 32px rgba(17,17,17,0.10);
+      --shadow-lg:   0 24px 64px rgba(17,17,17,0.12);
+      --radius-sm:   8px;
+      --radius-md:   16px;
+      --radius-lg:   24px;
+      --sidebar-w:   240px;
+      --transition:  cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--cream);
+      color: var(--text-1);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* LAYOUT */
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar-w);
+      min-height: 100vh;
+      background: var(--black);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      gap: 8px;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 8px;
+    }
+
+    .logo-mark {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Sora', sans-serif;
+      font-weight: 800;
+      font-size: 14px;
+      color: var(--black);
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+
+    .logo-text span {
+      color: var(--accent);
+    }
+
+    .sidebar-section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      padding: 12px 12px 4px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s var(--transition);
+      color: rgba(255,255,255,0.55);
+      font-size: 14px;
+      font-weight: 500;
+      user-select: none;
+      position: relative;
+    }
+
+    .nav-item:hover {
+      background: rgba(255,255,255,0.07);
+      color: rgba(255,255,255,0.9);
+    }
+
+    .nav-item.active {
+      background: var(--accent);
+      color: var(--black);
+    }
+
+    .nav-item.active svg { color: var(--black); }
+
+    .nav-item svg {
+      width: 16px; height: 16px;
+      flex-shrink: 0;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.6);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 99px;
+    }
+
+    .nav-item.active .nav-badge {
+      background: rgba(17,17,17,0.15);
+      color: var(--black);
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 16px;
+    }
+
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .sidebar-user:hover { background: rgba(255,255,255,0.07); }
+
+    .user-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--sky));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--black);
+      flex-shrink: 0;
+    }
+
+    .user-info { flex: 1; overflow: hidden; }
+    .user-name { font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-plan { font-size: 11px; color: rgba(255,255,255,0.35); }
+
+    /* MAIN CONTENT */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* TOP NAV */
+    .topnav {
+      height: 60px;
+      background: rgba(246,241,216,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 32px;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topnav-title {
+      font-family: 'Sora', sans-serif;
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--text-1);
+      flex: 1;
+    }
+
+    .topnav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s var(--transition);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-2);
+    }
+    .btn-ghost:hover { background: var(--glass-dark); color: var(--text-1); }
+
+    .btn-primary {
+      background: var(--black);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #2a2a2a;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-accent {
+      background: var(--accent);
+      color: var(--black);
+    }
+    .btn-accent:hover {
+      background: var(--accent-dim);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(233,200,74,0.35);
+    }
+
+    .btn svg { width: 14px; height: 14px; }
+
+    /* VIEWS (pages) */
+    .view { display: none; animation: fadeUp 0.4s var(--transition) both; }
+    .view.active { display: block; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* HOME / RESEARCH INPUT VIEW */
+    .home-view {
+      padding: 0;
+      display: none;
+      flex-direction: column;
+    }
+    .home-view.active { display: flex; }
+
+    .hero-section {
+      min-height: calc(100vh - 60px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Floating gradient orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(80px);
+      opacity: 0.5;
+      animation: floatOrb 8s ease-in-out infinite;
+    }
+    .orb-1 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, var(--yellow-soft), transparent 70%);
+      top: -100px; right: -100px;
+      animation-delay: 0s;
+    }
+    .orb-2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, var(--sky), transparent 70%);
+      bottom: -80px; left: -80px;
+      animation-delay: -3s;
+    }
+    .orb-3 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(233,200,74,0.3), transparent 70%);
+      top: 40%; left: 10%;
+      animation-delay: -6s;
+    }
+
+    @keyframes floatOrb {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33%       { transform: translate(20px, -30px) scale(1.05); }
+      66%       { transform: translate(-15px, 15px) scale(0.97); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 720px;
+      width: 100%;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--black);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 99px;
+      margin-bottom: 24px;
+    }
+
+    .hero-badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    .hero-heading {
+      font-family: 'Sora', sans-serif;
+      font-size: clamp(36px, 5vw, 60px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -2px;
+      color: var(--text-1);
+      margin-bottom: 16px;
+    }
+
+    .hero-heading .accent-word {
+      color: transparent;
+      -webkit-text-stroke: 2px var(--black);
+      position: relative;
+    }
+
+    .hero-heading .highlight {
+      background: var(--accent);
+      padding: 0 8px;
+      border-radius: 6px;
+    }
+
+    .hero-sub {
+      font-size: 18px;
+      color: var(--text-2);
+      line-height: 1.6;
+      margin-bottom: 40px;
+      font-weight: 400;
+    }
+
+    /* Search / Input box */
+    .research-input-card {
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,255,255,0.9);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-lg), 0 0 0 1px var(--border);
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .research-textarea {
+      width: 100%;
+      min-height: 100px;
+      border: none;
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      color: var(--text-1);
+      resize: none;
+      outline: none;
+      line-height: 1.6;
+    }
+
+    .research-textarea::placeholder { color: var(--text-3); }
+
+    .input-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .input-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      padding: 4px 10px;
+      background: var(--glass-dark);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      font-size: 12px;
+      color: var(--text-2);
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+    }
+
+    .chip:hover { background: var(--yellow-soft); border-color: var(--accent); color: var(--text-1); }
+
+    .generate-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--black);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s var(--transition);
+      white-space: nowrap;
+    }
+
+    .generate-btn:hover:not(:disabled) {
+      background: #222;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(17,17,17,0.25);
+    }
+
+    .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .generate-btn svg { width: 16px; height: 16px; }
+
+    /* Agent preview cards below input */
+    .agent-preview-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+
+    .agent-mini-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.8);
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-2);
+    }
+
+    .agent-mini-icon {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+
+    /* RESEARCH (Active / Running) VIEW */
+    .research-view {
+      padding: 32px;
+      display: none;
+      gap: 24px;
+    }
+    .research-view.active { display: grid; grid-template-columns: 1fr 360px; }
+
+    .research-left { display: flex; flex-direction: column; gap: 20px; }
+    .research-right { display: flex; flex-direction: column; gap: 16px; }
+
+    /* Research header */
+    .research-header {
+      background: rgba(255,255,255,0.65);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.9);
+      border-radius: var(--radius-md);
+      padding: 20px 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .research-topic-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 6px;
+    }
+
+    .research-topic-text {
+      font-family: 'Sora', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-1);
+      line-height: 1.3;
+    }
+
+    .research-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    .meta-pill {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: var(--text-3);
+      font-weight: 500;
+    }
+
+    .meta-pill svg { width: 12px; height: 12px; }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-badge.running {
+      background: rgba(233,200,74,0.18);
+      color: #8a6800;
+      border: 1px solid rgba(233,200,74,0.4);
+    }
+
+    .status-badge.complete {
+      background: rgba(34,197,94,0.12);
+      color: #166534;
+      border: 1px solid rgba(34,197,94,0.3);
+    }
+
+    .status-badge.idle {
+      background: var(--glass-dark);
+      color: var(--text-3);
+      border: 1px solid var(--border);
+    }
+
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .status-badge.running .status-dot { animation: pulse 1.4s ease infinite; }
+
+    /* AGENT PIPELINE CARDS */
+    .pipeline-section {}
+
+    .section-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      color: var(--text-1);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title svg { width: 14px; height: 14px; color: var(--text-3); }
+
+    .agents-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .agent-card {
+      background: rgba(255,255,255,0.65);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.9);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.35s var(--transition);
+    }
+
+    .agent-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      opacity: 0;
+      transition: opacity 0.4s;
+      pointer-events: none;
+    }
+
+    .agent-card.search::before  { background: linear-gradient(135deg, rgba(216,232,247,0.5), transparent); }
+    .agent-card.reader::before  { background: linear-gradient(135deg, rgba(243,231,154,0.4), transparent); }
+    .agent-card.writer::before  { background: linear-gradient(135deg, rgba(233,200,74,0.25), transparent); }
+    .agent-card.critic::before  { background: linear-gradient(135deg, rgba(246,241,216,0.8), transparent); }
+
+    .agent-card.running::before { opacity: 1; }
+
+    .agent-card.running {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent), 0 8px 32px rgba(233,200,74,0.2), var(--shadow-sm);
+    }
+
+    .agent-card.complete {
+      border-color: rgba(34,197,94,0.4);
+      box-shadow: 0 0 0 1px rgba(34,197,94,0.3), var(--shadow-sm);
+    }
+
+    .agent-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .agent-icon {
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      position: relative;
+    }
+
+    .agent-card.search  .agent-icon { background: var(--sky); }
+    .agent-card.reader  .agent-icon { background: var(--yellow-soft); }
+    .agent-card.writer  .agent-icon { background: rgba(233,200,74,0.25); }
+    .agent-card.critic  .agent-icon { background: rgba(17,17,17,0.06); }
+
+    .agent-card.running .agent-icon::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 15px;
+      border: 2px solid var(--accent);
+      animation: iconRing 1.5s ease-in-out infinite;
+    }
+
+    @keyframes iconRing {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(1.1); }
+    }
+
+    .agent-card-name {
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-1);
+      margin-bottom: 3px;
+    }
+
+    .agent-card-desc {
+      font-size: 12px;
+      color: var(--text-3);
+    }
+
+    .agent-state {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    .agent-state.idle     { color: var(--text-3); background: var(--glass-dark); }
+    .agent-state.running  { color: #8a6800; background: rgba(233,200,74,0.18); }
+    .agent-state.complete { color: #166534; background: rgba(34,197,94,0.12); }
+
+    /* Progress bar */
+    .agent-progress {
+      height: 4px;
+      background: rgba(17,17,17,0.06);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 14px;
+    }
+
+    .agent-progress-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.6s var(--transition);
+    }
+
+    .agent-card.complete .agent-progress-fill {
+      width: 100%;
+      background: #22c55e;
+    }
+
+    .agent-progress-fill.running {
+      animation: shimmer 1.8s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: -200px; }
+      100% { background-position: 200px; }
+    }
+
+    /* ACTIVITY / LOG PANEL */
+    .activity-panel {
+      background: rgba(255,255,255,0.65);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.9);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      flex: 1;
+    }
+
+    .activity-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255,255,255,0.4);
+    }
+
+    .activity-header-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-1);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .live-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 1.2s ease infinite;
+    }
+
+    .activity-body {
+      padding: 16px;
+      max-height: 340px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .activity-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      animation: slideIn 0.35s var(--transition) both;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-12px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .activity-icon {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 13px;
+    }
+
+    .activity-icon.search  { background: var(--sky); }
+    .activity-icon.reader  { background: var(--yellow-soft); }
+    .activity-icon.writer  { background: rgba(233,200,74,0.2); }
+    .activity-icon.critic  { background: rgba(17,17,17,0.06); }
+    .activity-icon.system  { background: var(--glass-dark); }
+
+    .activity-content {}
+    .activity-title { font-size: 13px; font-weight: 600; color: var(--text-1); }
+    .activity-detail { font-size: 12px; color: var(--text-3); margin-top: 2px; line-height: 1.4; }
+    .activity-time { font-size: 10px; color: var(--text-3); margin-top: 3px; }
+
+    /* REPORT VIEW */
+    .report-view {
+      padding: 32px;
+      display: none;
+    }
+    .report-view.active { display: block; }
+
+    .report-container {
+      max-width: 860px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .report-hero {
+      background: var(--black);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .report-hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 240px; height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(233,200,74,0.3), transparent 70%);
+    }
+
+    .report-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .report-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.25;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+    }
+
+    .report-stats {
+      display: flex;
+      gap: 24px;
+    }
+
+    .report-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .report-stat-value {
+      font-family: 'Sora', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .report-stat-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      font-weight: 500;
+    }
+
+    /* Report section cards */
+    .report-section {
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.9);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s;
+    }
+
+    .report-section:hover { box-shadow: var(--shadow-md); }
+
+    .report-section-header {
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.3);
+    }
+
+    .report-section-header:hover { background: rgba(255,255,255,0.55); }
+
+    .report-section-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-num {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: var(--black);
+      color: var(--accent);
+      font-family: 'Sora', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .report-section-name {
+      font-family: 'Sora', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-1);
+    }
+
+    .expand-icon {
+      width: 18px; height: 18px;
+      color: var(--text-3);
+      transition: transform 0.25s;
+    }
+
+    .report-section.expanded .expand-icon { transform: rotate(180deg); }
+
+    .report-section-body {
+      padding: 24px;
+      display: none;
+    }
+
+    .report-section.expanded .report-section-body { display: block; }
+
+    .report-prose {
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--text-2);
+    }
+
+    .report-prose p { margin-bottom: 14px; }
+    .report-prose p:last-child { margin-bottom: 0; }
+
+    .report-prose strong { color: var(--text-1); font-weight: 600; }
+
+    .report-prose h4 {
+      font-family: 'Sora', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-1);
+      margin: 20px 0 8px;
+    }
+
+    .finding-card {
+      background: var(--glass-dark);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .finding-num {
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      background: var(--accent);
+      color: var(--black);
+      font-size: 11px;
+      font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .finding-text { font-size: 14px; color: var(--text-2); line-height: 1.5; }
+
+    .source-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+      transition: background 0.15s;
+    }
+
+    .source-item:hover { background: rgba(255,255,255,0.5); }
+
+    .source-favicon {
+      width: 24px; height: 24px;
+      border-radius: 6px;
+      background: var(--sky);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .source-url { font-size: 13px; color: var(--text-2); font-weight: 500; }
+    .source-title { font-size: 12px; color: var(--text-3); }
+
+    /* Critic score */
+    .critic-score-block {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 20px;
+      background: var(--black);
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+
+    .score-ring {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: conic-gradient(var(--accent) 0% 85%, rgba(255,255,255,0.1) 85%);
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .score-ring-inner {
+      width: 54px; height: 54px;
+      border-radius: 50%;
+      background: var(--black);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Sora', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .critic-label { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .critic-desc { font-size: 13px; color: rgba(255,255,255,0.45); }
+
+    /* HISTORY VIEW */
+    .history-view {
+      padding: 32px;
+      display: none;
+    }
+    .history-view.active { display: block; }
+
+    .history-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .history-card {
+      background: rgba(255,255,255,0.65);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.9);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.25s var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .history-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--accent);
+    }
+
+    .history-card-date { font-size: 11px; color: var(--text-3); font-weight: 500; margin-bottom: 8px; }
+    .history-card-title { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: var(--text-1); line-height: 1.35; margin-bottom: 10px; }
+
+    .history-card-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .history-tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 99px;
+      background: var(--glass-dark);
+      color: var(--text-3);
+      border: 1px solid var(--border);
+    }
+
+    .history-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .history-score {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-2);
+    }
+
+    .history-score-bar {
+      width: 40px;
+      height: 4px;
+      border-radius: 99px;
+      background: var(--glass-dark);
+      overflow: hidden;
+    }
+
+    .history-score-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: var(--accent);
+    }
+
+    /* SETTINGS VIEW */
+    .settings-view {
+      padding: 32px;
+      display: none;
+    }
+    .settings-view.active { display: block; }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .settings-card {
+      background: rgba(255,255,255,0.65);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.9);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .settings-card-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-1);
+      margin-bottom: 4px;
+    }
+
+    .settings-card-sub {
+      font-size: 13px;
+      color: var(--text-3);
+      margin-bottom: 20px;
+    }
+
+    .form-field { margin-bottom: 16px; }
+    .form-label { font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 6px; display: block; }
+
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.7);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: var(--text-1);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus { border-color: var(--accent); }
+
+    .form-select {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.7);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: var(--text-1);
+      outline: none;
+      appearance: none;
+      cursor: pointer;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .toggle-row:last-child { border-bottom: none; }
+
+    .toggle-label { font-size: 13px; color: var(--text-2); font-weight: 500; }
+
+    .toggle {
+      width: 40px; height: 22px;
+      border-radius: 99px;
+      background: var(--glass-dark);
+      border: 1px solid var(--border);
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+
+    .toggle.on { background: var(--black); border-color: var(--black); }
+
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.25s var(--transition);
+    }
+
+    .toggle.on::after { transform: translateX(18px); }
+
+    /* PAGE HEADER */
+    .page-header {
+      margin-bottom: 4px;
+    }
+
+    .page-heading {
+      font-family: 'Sora', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-1);
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+
+    .page-sub {
+      font-size: 14px;
+      color: var(--text-3);
+    }
+
+    /* UTILITIES */
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .gap-8 { gap: 8px; }
+    .gap-12 { gap: 12px; }
+    .ml-auto { margin-left: auto; }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+    /* API ENDPOINT INDICATOR */
+    .api-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.25);
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #166534;
+    }
+
+    .api-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; animation: pulse 2s ease infinite; }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .research-view.active { grid-template-columns: 1fr; }
+      .agents-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      :root { --sidebar-w: 0px; }
+      .sidebar { display: none; }
+      .agents-grid { grid-template-columns: 1fr; }
+      .settings-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">A</div>
+      <div class="logo-text">ARI<span>A</span></div>
+    </div>
+
+    <div class="sidebar-section-label">Workspace</div>
+
+    <div class="nav-item active" data-view="home" onclick="switchView('home')">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      New Research
+    </div>
+
+    <div class="nav-item" data-view="history" onclick="switchView('history')">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Research History
+      <span class="nav-badge">6</span>
+    </div>
+
+    <div class="nav-item" onclick="switchView('report')">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Saved Reports
+      <span class="nav-badge">3</span>
+    </div>
+
+    <div class="sidebar-section-label" style="margin-top:8px">System</div>
+
+    <div class="nav-item" data-view="settings" onclick="switchView('settings')">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar">R</div>
+        <div class="user-info">
+          <div class="user-name">Research User</div>
+          <div class="user-plan">Pro Plan</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOP NAV -->
+    <nav class="topnav">
+      <div class="topnav-title" id="topnavTitle">Research Dashboard</div>
+      <div class="topnav-actions">
+        <div class="api-indicator">
+          <div class="api-dot"></div>
+          API Connected
+        </div>
+        <button class="btn btn-ghost" onclick="switchView('home')">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Research
+        </button>
+      </div>
+    </nav>
+
+    <!-- HOME VIEW -->
+    <div class="view home-view active" id="view-home">
+      <div class="hero-section">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+
+        <div class="hero-content">
+          <div class="hero-badge">
+            <div class="hero-badge-dot"></div>
+            4 AI Agents · Active Research System
+          </div>
+
+          <h1 class="hero-heading">
+            Deep Research,<br>
+            <span class="highlight">Autonomously</span> Powered
+          </h1>
+
+          <p class="hero-sub">
+            Enter any research topic. ARIA's multi-agent pipeline will search, read,<br>
+            synthesize, and critically review — delivering a comprehensive report.
+          </p>
+
+          <div class="research-input-card">
+            <textarea
+              class="research-textarea"
+              id="researchInput"
+              placeholder="e.g. What is the current state of quantum computing and its commercial applications in 2025?"
+              rows="3"
+            ></textarea>
+
+            <div class="input-footer">
+              <div class="input-chips">
+                <div class="chip" onclick="setTopic(this)">Quantum Computing</div>
+                <div class="chip" onclick="setTopic(this)">AI & Healthcare</div>
+                <div class="chip" onclick="setTopic(this)">Climate Tech</div>
+                <div class="chip" onclick="setTopic(this)">Geopolitics 2025</div>
+              </div>
+              <button class="generate-btn" id="generateBtn" onclick="startResearch()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Generate Research
+              </button>
+            </div>
+          </div>
+
+          <div class="agent-preview-row">
+            <div class="agent-mini-card">
+              <div class="agent-mini-icon" style="background:var(--sky)">🔍</div>
+              Search Agent
+            </div>
+            <div class="agent-mini-card">
+              <div class="agent-mini-icon" style="background:var(--yellow-soft)">📖</div>
+              Reader Agent
+            </div>
+            <div class="agent-mini-card">
+              <div class="agent-mini-icon" style="background:rgba(233,200,74,0.2)">✍️</div>
+              Writer Agent
+            </div>
+            <div class="agent-mini-card">
+              <div class="agent-mini-icon" style="background:rgba(17,17,17,0.06)">🔬</div>
+              Critic Agent
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESEARCH RUNNING VIEW -->
+    <div class="view research-view" id="view-research">
+      <!-- LEFT -->
+      <div class="research-left">
+        <!-- Header -->
+        <div class="research-header">
+          <div class="research-topic-label">Research Topic</div>
+          <div class="research-topic-text" id="activeTopicText">—</div>
+          <div class="research-meta">
+            <div class="status-badge running" id="researchStatusBadge">
+              <div class="status-dot"></div>
+              Running
+            </div>
+            <div class="meta-pill">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span id="elapsedTimer">0s</span>
+            </div>
+            <div class="meta-pill">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              4 Agents
+            </div>
+          </div>
+        </div>
+
+        <!-- Agent Pipeline -->
+        <div class="pipeline-section">
+          <div class="section-title">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            Agent Pipeline
+          </div>
+
+          <div class="agents-grid">
+            <!-- Search Agent -->
+            <div class="agent-card search" id="agent-search">
+              <div class="agent-card-header">
+                <div>
+                  <div class="agent-icon">🔍</div>
+                </div>
+                <div style="text-align:right">
+                  <div class="agent-state idle" id="state-search">Idle</div>
+                </div>
+              </div>
+              <div class="agent-card-name">Search Agent</div>
+              <div class="agent-card-desc" id="desc-search">Searches the web for relevant sources and data</div>
+              <div class="agent-progress">
+                <div class="agent-progress-fill" id="prog-search"></div>
+              </div>
+            </div>
+
+            <!-- Reader Agent -->
+            <div class="agent-card reader" id="agent-reader">
+              <div class="agent-card-header">
+                <div><div class="agent-icon">📖</div></div>
+                <div style="text-align:right">
+                  <div class="agent-state idle" id="state-reader">Idle</div>
+                </div>
+              </div>
+              <div class="agent-card-name">Reader Agent</div>
+              <div class="agent-card-desc" id="desc-reader">Extracts and processes content from sources</div>
+              <div class="agent-progress">
+                <div class="agent-progress-fill" id="prog-reader"></div>
+              </div>
+            </div>
+
+            <!-- Writer Agent -->
+            <div class="agent-card writer" id="agent-writer">
+              <div class="agent-card-header">
+                <div><div class="agent-icon">✍️</div></div>
+                <div style="text-align:right">
+                  <div class="agent-state idle" id="state-writer">Idle</div>
+                </div>
+              </div>
+              <div class="agent-card-name">Writer Agent</div>
+              <div class="agent-card-desc" id="desc-writer">Synthesizes findings into a coherent report</div>
+              <div class="agent-progress">
+                <div class="agent-progress-fill" id="prog-writer"></div>
+              </div>
+            </div>
+
+            <!-- Critic Agent -->
+            <div class="agent-card critic" id="agent-critic">
+              <div class="agent-card-header">
+                <div><div class="agent-icon">🔬</div></div>
+                <div style="text-align:right">
+                  <div class="agent-state idle" id="state-critic">Idle</div>
+                </div>
+              </div>
+              <div class="agent-card-name">Critic Agent</div>
+              <div class="agent-card-desc" id="desc-critic">Reviews, scores, and validates the report</div>
+              <div class="agent-progress">
+                <div class="agent-progress-fill" id="prog-critic"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Activity Panel -->
+      <div class="research-right">
+        <div class="activity-panel">
+          <div class="activity-header">
+            <div class="activity-header-title">
+              <div class="live-dot"></div>
+              Live Activity
+            </div>
+            <button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" onclick="clearActivity()">Clear</button>
+          </div>
+          <div class="activity-body" id="activityFeed">
+            <div style="text-align:center;color:var(--text-3);font-size:13px;padding:32px 0">
+              Research activity will appear here…
+            </div>
+          </div>
+        </div>
+
+        <!-- View Report Button (shown when complete) -->
+        <button class="btn btn-primary" id="viewReportBtn" style="display:none;width:100%;justify-content:center;padding:14px" onclick="switchView('report')">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          View Full Report
+        </button>
+      </div>
+    </div>
+
+    <!-- REPORT VIEW -->
+    <div class="view report-view" id="view-report">
+      <div class="report-container">
+
+        <!-- Hero block -->
+        <div class="report-hero">
+          <div class="report-eyebrow">Research Report · ARIA</div>
+          <div class="report-title" id="reportTitle">Research Report</div>
+          <div class="report-stats">
+            <div class="report-stat">
+              <div class="report-stat-value" id="reportSources">—</div>
+              <div class="report-stat-label">Sources</div>
+            </div>
+            <div class="report-stat">
+              <div class="report-stat-value" id="reportWords">—</div>
+              <div class="report-stat-label">Words</div>
+            </div>
+            <div class="report-stat">
+              <div class="report-stat-value" id="reportScore">—</div>
+              <div class="report-stat-label">Quality Score</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="report-section expanded" id="rs-summary">
+          <div class="report-section-header" onclick="toggleSection('rs-summary')">
+            <div class="report-section-title-row">
+              <div class="section-num">01</div>
+              <div class="report-section-name">Executive Summary</div>
+            </div>
+            <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="report-section-body">
+            <div class="report-prose" id="report-summary">
+              <p>This section will display the executive summary generated by the Writer Agent, drawing from all sources collected and processed by the Search and Reader Agents.</p>
+              <p><strong>Run a research query to populate this report.</strong></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Key Findings -->
+        <div class="report-section expanded" id="rs-findings">
+          <div class="report-section-header" onclick="toggleSection('rs-findings')">
+            <div class="report-section-title-row">
+              <div class="section-num">02</div>
+              <div class="report-section-name">Key Findings</div>
+            </div>
+            <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="report-section-body" id="report-findings">
+            <div class="finding-card">
+              <div class="finding-num">1</div>
+              <div class="finding-text">Key findings from your research will appear here as numbered cards after the research pipeline completes.</div>
+            </div>
+            <div class="finding-card">
+              <div class="finding-num">2</div>
+              <div class="finding-text">Each finding represents a distilled insight extracted by the Reader and Writer Agents from multiple sources.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Deep Analysis -->
+        <div class="report-section" id="rs-analysis">
+          <div class="report-section-header" onclick="toggleSection('rs-analysis')">
+            <div class="report-section-title-row">
+              <div class="section-num">03</div>
+              <div class="report-section-name">Deep Analysis</div>
+            </div>
+            <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="report-section-body">
+            <div class="report-prose" id="report-analysis">
+              <p>The deep analysis section will contain the comprehensive narrative generated by the Writer Agent, covering contextual background, trend analysis, cross-source synthesis, and implications.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sources -->
+        <div class="report-section" id="rs-sources">
+          <div class="report-section-header" onclick="toggleSection('rs-sources')">
+            <div class="report-section-title-row">
+              <div class="section-num">04</div>
+              <div class="report-section-name">Sources</div>
+            </div>
+            <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="report-section-body" id="report-sources-body">
+            <div class="source-item">
+              <div class="source-favicon">🌐</div>
+              <div>
+                <div class="source-url">example-source.com</div>
+                <div class="source-title">Sources discovered by the Search Agent will appear here</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Critic Review -->
+        <div class="report-section expanded" id="rs-critic">
+          <div class="report-section-header" onclick="toggleSection('rs-critic')">
+            <div class="report-section-title-row">
+              <div class="section-num">05</div>
+              <div class="report-section-name">Critic Review</div>
+            </div>
+            <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="report-section-body">
+            <div class="critic-score-block">
+              <div class="score-ring">
+                <div class="score-ring-inner" id="criticScoreDisplay">—</div>
+              </div>
+              <div>
+                <div class="critic-label">Quality Assessment</div>
+                <div class="critic-desc" id="criticVerdict">Pending Critic Agent evaluation</div>
+              </div>
+            </div>
+            <div class="report-prose" id="report-critic">
+              <p>The Critic Agent's detailed review, including accuracy assessment, source credibility evaluation, and suggestions for improvement, will appear here after the pipeline completes.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- HISTORY VIEW -->
+    <div class="view history-view" id="view-history">
+      <div class="page-header">
+        <div class="page-heading">Research History</div>
+        <div class="page-sub">Your previous research sessions and generated reports</div>
+      </div>
+
+      <div class="history-grid" id="historyGrid">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- SETTINGS VIEW -->
+    <div class="view settings-view" id="view-settings">
+      <div class="page-header">
+        <div class="page-heading">Settings</div>
+        <div class="page-sub">Configure your research system and API connections</div>
+      </div>
+
+      <div class="settings-grid">
+
+        <div class="settings-card">
+          <div class="settings-card-title">Backend API</div>
+          <div class="settings-card-sub">Connect your Python LangChain backend</div>
+          <div class="form-field">
+            <label class="form-label">API Base URL</label>
+            <input class="form-input" id="apiBaseUrl" type="text" value="http://localhost:8000" placeholder="http://localhost:8000" />
+          </div>
+          <div class="form-field">
+            <label class="form-label">API Key (optional)</label>
+            <input class="form-input" type="password" placeholder="sk-..." />
+          </div>
+          <button class="btn btn-primary" onclick="testApiConnection()" style="width:100%;justify-content:center">Test Connection</button>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-title">Research Preferences</div>
+          <div class="settings-card-sub">Customize agent behavior</div>
+          <div class="form-field">
+            <label class="form-label">Search Depth</label>
+            <select class="form-select">
+              <option>Standard (8–12 sources)</option>
+              <option>Deep (20–30 sources)</option>
+              <option>Comprehensive (50+ sources)</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Report Length</label>
+            <select class="form-select">
+              <option>Concise (~500 words)</option>
+              <option selected>Standard (~1500 words)</option>
+              <option>Comprehensive (~3000 words)</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Language</label>
+            <select class="form-select">
+              <option>English</option>
+              <option>Hindi</option>
+              <option>Spanish</option>
+              <option>French</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-title">Agent Configuration</div>
+          <div class="settings-card-sub">Toggle individual agents</div>
+          <div class="toggle-row">
+            <div class="toggle-label">🔍 Search Agent</div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-label">📖 Reader Agent</div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-label">✍️ Writer Agent</div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-label">🔬 Critic Agent</div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-title">Display & Interface</div>
+          <div class="settings-card-sub">UI preferences</div>
+          <div class="toggle-row">
+            <div class="toggle-label">Show live activity feed</div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-label">Auto-open report on complete</div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-label">Save to history automatically</div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-label">Show Critic score on cards</div>
+            <div class="toggle" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- FOOTER -->
+    <footer style="text-align: center; padding: 24px; margin-top: 40px; color: var(--text-3); font-size: 13px; border-top: 1px solid var(--border);">
+      Copyright &copy; 2026 &mdash; Raunak Kumar Jha - AI & Backend Developer
+    </footer>
+
+  </main>
+</div>
+<!-- JAVASCRIPT -->
+<script src="src/services/api.js"></script>
+<script src="src/app.js"></script>
+</body>
+</html>
